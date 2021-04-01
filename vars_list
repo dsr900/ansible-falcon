@@ -1,0 +1,9 @@
+all:
+  hosts: local
+  vars:
+    dir:
+    fasta_reads:
+    bam_reads:
+    HiC_reads:
+    
+
