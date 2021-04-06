@@ -8,6 +8,7 @@ of how it works.
 ### Git clone this repository
 	
 	git clone https://github.com/audreystott/ansible-falcon.git
+	cd ansible-falcon
 
 ### Run the following Ansible script
 
