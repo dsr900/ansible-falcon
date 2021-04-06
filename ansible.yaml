@@ -6,19 +6,16 @@
     prompt: "Enter your project directory"
     private: no
   - name: fasta_read_1
-    prompt: "Enter the name of your fasta read 1 file"
+    prompt: "Enter the name of your fasta read 1 file (subreads1.fasta if doing demo)"
     private: no
   - name: fasta_read_2
-    prompt: "Enter the name of your fasta read 2 file"
+    prompt: "Enter the name of your fasta read 2 file (subreads2.fasta if doing demo)"
     private: no
   - name: bam_read_1
-    prompt: "Enter the name of your bam read 1 file"
+    prompt: "Enter the name of your bam read 1 file (subreads1.bam if doing demo)"
     private: no
   - name: bam_read_2
-    prompt: "Enter the name of your bam read 2 file"
-    private: no
-  - name: HiC_reads
-    prompt: "Enter the name of your HiC read files (use an asterisk e.g. Sample_HiC_R*.fastq.gz)"
+    prompt: "Enter the name of your bam read 2 file (subreads2.bam if doing demo)" 
     private: no
   tasks:
   - name: Starting a Slurm interactive session
@@ -26,7 +23,6 @@
   - name: Setting up Falcon
     shell: |
       cd {{ dir }}
-      ##git clone https://github.com/AustralianBioCommons/falcon.git
       cd falcon
       bash download-sample-data.sh
       echo '{{ dir }}/{{ fasta_read_1 }}' > subreads.fasta.fofn
