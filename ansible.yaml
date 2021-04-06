@@ -27,7 +27,8 @@
       git clone https://github.com/pb-cdunn/FALCON-examples.git
       cd FALCON-examples
       ../git-sym/git-sym update run/greg200k-sv2
-      mv run/greg200k-sv2/data/greg200k-sv2/subreads* project_dir/ansible-falcon/falcon/
+      mv run/greg200k-sv2/data/greg200k-sv2/subreads* {{ dir }}/ansible-falcon/falcon/
+      cd {{ dir }}/ansible-falcon/falcon
       rm -rf FALCON-examples/ git-sym/
       echo '{{ dir }}/ansible-falcon/falcon/{{ fasta_read_1 }}' > subreads.fasta.fofn
       echo '{{ dir }}/ansible-falcon/falcon/{{ fasta_read_2 }}' >> subreads.fasta.fofn
