@@ -3,7 +3,7 @@
   hosts: localhost
   vars_prompt:
   - name: dir
-    prompt: "Enter your Falcon project directory"
+    prompt: "Enter your project directory"
     private: no
   - name: fasta_read_1
     prompt: "Enter the name of your fasta read 1 file"
@@ -17,9 +17,9 @@
   - name: bam_read_2
     prompt: "Enter the name of your bam read 2 file"
     private: no
-##  - name: HiC_reads
-##    prompt: "Enter the name of your HiC read files (use an asterisk e.g. Sample_HiC_R*.fastq.gz)"
-##    private: no
+  - name: HiC_reads
+    prompt: "Enter the name of your HiC read files (use an asterisk e.g. Sample_HiC_R*.fastq.gz)"
+    private: no
   tasks:
   - name: Starting a Slurm interactive session
     command: salloc -n 1 -t 1:00:00 --account=$PAWSEY_PROJECT
@@ -28,6 +28,7 @@
       cd {{ dir }}
       ##git clone https://github.com/AustralianBioCommons/falcon.git
       cd falcon
+      bash download-sample-data.sh
       echo '{{ dir }}/{{ fasta_read_1 }}' > subreads.fasta.fofn
       echo '{{ dir }}/{{ fasta_read_2 }}' >> subreads.fasta.fofn
       echo '{{ dir }}/{{ bam_read_1 }}' > subreads.bam.fofn
@@ -35,6 +36,7 @@
       sed -i "s|hic_reads|{{ HiC_reads }}|g" main.nf
       sed -i "s|project_dir|{{ dir }}|g" main.nf
       sed -i "s|project_dir|{{ dir }}|g" nextflow.config
+      sed -i "s|project_dir|{{ dir }}|g" download-sample-data.sh
       module load singularity
       singularity pull docker://quay.io/biocontainers/pbcore:1.7.1--py27_0
       wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
