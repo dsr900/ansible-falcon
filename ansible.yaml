@@ -24,10 +24,10 @@
     shell: |
       cd {{ dir }}/ansible-falcon/falcon
       bash download-sample-data.sh
-      echo '{{ dir }}/{{ fasta_read_1 }}' > subreads.fasta.fofn
-      echo '{{ dir }}/{{ fasta_read_2 }}' >> subreads.fasta.fofn
-      echo '{{ dir }}/{{ bam_read_1 }}' > subreads.bam.fofn
-      echo '{{ dir }}/{{ bam_read_2 }}' >> subreads.bam.fofn
+      echo '{{ dir }}/falcon-ansible/falcon/{{ fasta_read_1 }}' > subreads.fasta.fofn
+      echo '{{ dir }}/falcon-ansible/falcon/{{ fasta_read_2 }}' >> subreads.fasta.fofn
+      echo '{{ dir }}/falcon-ansible/falcon/{{ bam_read_1 }}' > subreads.bam.fofn
+      echo '{{ dir }}/falcon-ansible/falcon/{{ bam_read_2 }}' >> subreads.bam.fofn
       sed -i "s|project_dir|{{ dir }}|g" main.nf
       sed -i "s|project_dir|{{ dir }}|g" nextflow.config
       sed -i "s|project_dir|{{ dir }}|g" download-sample-data.sh
