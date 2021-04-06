@@ -3,8 +3,7 @@ fasta_ch1 = Channel.fromPath('falcon/subreads.fasta.fofn')
 fasta_ch2 = Channel.fromPath('falcon/subreads.fasta.fofn')
 fasta_ch3 = Channel.fromPath('falcon/subreads.fasta.fofn')
 bam_ch = Channel.fromPath('falcon/subreads.bam.fofn')
-hic_ch = Channel.fromPath('hic_reads')
-dir = "project_dir"
+dir = "project_dir/falcon"
 
 process fc_run {
     publishDir "${dir}"
