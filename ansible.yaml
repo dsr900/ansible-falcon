@@ -22,14 +22,12 @@
     command: salloc -n 1 -t 1:00:00 --account=$PAWSEY_PROJECT
   - name: Setting up Falcon
     shell: |
-      cd {{ dir }}
-      cd falcon
+      cd {{ dir }}/ansible-falcon/falcon
       bash download-sample-data.sh
       echo '{{ dir }}/{{ fasta_read_1 }}' > subreads.fasta.fofn
       echo '{{ dir }}/{{ fasta_read_2 }}' >> subreads.fasta.fofn
       echo '{{ dir }}/{{ bam_read_1 }}' > subreads.bam.fofn
       echo '{{ dir }}/{{ bam_read_2 }}' >> subreads.bam.fofn
-      sed -i "s|hic_reads|{{ HiC_reads }}|g" main.nf
       sed -i "s|project_dir|{{ dir }}|g" main.nf
       sed -i "s|project_dir|{{ dir }}|g" nextflow.config
       sed -i "s|project_dir|{{ dir }}|g" download-sample-data.sh
@@ -44,4 +42,4 @@
       conda config --set auto_activate_base false
       conda init
   - name: Running Falcon
-    command: sbatch --account=$PAWSEY_PROJECT {{ dir }}/falcon/sbatch_nextflow.sh
+    command: sbatch --account=$PAWSEY_PROJECT {{ dir }}/ansible-falcon/falcon/sbatch_nextflow.sh
