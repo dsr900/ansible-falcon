@@ -12,7 +12,8 @@ of how it works.
 
 ### Download your data
 
-If wanting to use your own data, download them to the ~/ansible-falcon/falcon directory.
+Skip this step unless you would like to test this workflow with your own 
+data. Ensure to download your fasta and bam files to the ~/ansible-falcon/falcon directory.
 
 ### Run the following Ansible script
 
