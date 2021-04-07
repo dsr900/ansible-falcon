@@ -3,7 +3,7 @@
   hosts: localhost
   vars_prompt:
   - name: dir
-    prompt: "Enter your group directory ($MYGROUP if on Pawsey systems)"
+    prompt: "Enter your group or project directory"
     private: no
   - name: fasta_read_1
     prompt: "Enter the name of your fasta read 1 file (subreads1.fasta if doing demo)"
