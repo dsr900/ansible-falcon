@@ -1,0 +1,15 @@
+# Nextflow logs
+.nextflow*
+nf-work
+# Containers
+*.sif
+# Exmaple input
+subreads1*
+subreads2*
+# Nextflow work dirs
+0-*
+1-*
+2-*
+3-*
+4-*
+Unzip_config.json
