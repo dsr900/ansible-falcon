@@ -1,50 +1,94 @@
 ---
-- name: Installing and running Falcon
+- name: Installing Falcon
   hosts: localhost
-  vars_prompt:
-  - name: dir
-    prompt: "Enter your group or project directory"
-    private: no
-  - name: fasta_read_1
-    prompt: "Enter the name of your fasta read 1 file (subreads1.fasta if doing demo)"
-    private: no
-  - name: fasta_read_2
-    prompt: "Enter the name of your fasta read 2 file (subreads2.fasta if doing demo)"
-    private: no
-  - name: bam_read_1
-    prompt: "Enter the name of your bam read 1 file (subreads1.bam if doing demo)"
-    private: no
-  - name: bam_read_2
-    prompt: "Enter the name of your bam read 2 file (subreads2.bam if doing demo)" 
-    private: no
   tasks:
-  - name: Starting a Slurm interactive session
-    command: salloc -n 1 -t 1:00:00 --account=$PAWSEY_PROJECT
-  - name: Setting up Falcon
-    shell: |
-      cd {{ dir }}/ansible-falcon/falcon
-      git clone https://github.com/cdunn2001/git-sym.git
-      git clone https://github.com/pb-cdunn/FALCON-examples.git
-      cd FALCON-examples
-      ../git-sym/git-sym update run/greg200k-sv2
-      mv run/greg200k-sv2/data/greg200k-sv2/subreads* {{ dir }}/ansible-falcon/falcon/
-      cd {{ dir }}/ansible-falcon/falcon
-      rm -rf FALCON-examples/ git-sym/
-      echo '{{ dir }}/ansible-falcon/falcon/{{ fasta_read_1 }}' > subreads.fasta.fofn
-      echo '{{ dir }}/ansible-falcon/falcon/{{ fasta_read_2 }}' >> subreads.fasta.fofn
-      echo '{{ dir }}/ansible-falcon/falcon/{{ bam_read_1 }}' > subreads.bam.fofn
-      echo '{{ dir }}/ansible-falcon/falcon/{{ bam_read_2 }}' >> subreads.bam.fofn      
-      sed -i "s|project_dir|{{ dir }}|g" main.nf
-      sed -i "s|project_dir|{{ dir }}|g" nextflow.config
-      module load singularity
-      singularity pull docker://quay.io/biocontainers/pbcore:1.7.1--py27_0
-      wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
-      bash Miniconda3-latest-Linux-x86_64.sh -b -p {{ dir }}/miniconda3
-      rm Miniconda3-latest-Linux-x86_64.sh
-  - name: Activating conda 
-    shell: |  
+  - stat: path="{{ dir }}/ansible-falcon/falcon/subreads1.bam"
+    register: example_in
+
+  - name: Prepare git-syms repo
+    ansible.builtin.git:
+      repo: https://github.com/cdunn2001/git-sym.git
+      dest: "{{ dir }}/ansible-falcon/falcon/git-sym"
+      clone: yes
+    notify: Clean git-sym repo
+    when: example_in.stat.exists == False
+
+  - name: Prepare FALCON-examples repo
+    ansible.builtin.git:
+      repo: https://github.com/pb-cdunn/FALCON-examples.git
+      dest: "{{ dir }}/ansible-falcon/falcon/FALCON-examples"
+      clone: yes
+    notify: Clean FALCON-examples repo
+    when: example_in.stat.exists == False
+
+  - name: Prepare FALCON examples
+    ansible.builtin.command: ../git-sym/git-sym update run/greg200k-sv2
+    args:
+      chdir: "{{ dir }}/ansible-falcon/falcon/FALCON-examples"
+      creates: "{{ dir }}/ansible-falcon/falcon/FALCON-examples/.git-sym"
+    when: example_in.stat.exists == False
+
+  - name: Copy example input
+    ansible.builtin.copy:
+      src: "{{item}}"
+      dest: "{{dir}}/ansible-falcon/falcon"
+    loop:
+      - "{{ dir }}/ansible-falcon/falcon/FALCON-examples/run/greg200k-sv2/data/greg200k-sv2/subreads1.bam"
+      - "{{ dir }}/ansible-falcon/falcon/FALCON-examples/run/greg200k-sv2/data/greg200k-sv2/subreads1.bam.pbi"
+      - "{{ dir }}/ansible-falcon/falcon/FALCON-examples/run/greg200k-sv2/data/greg200k-sv2/subreads1.dexta"
+      - "{{ dir }}/ansible-falcon/falcon/FALCON-examples/run/greg200k-sv2/data/greg200k-sv2/subreads1.fasta"
+      - "{{ dir }}/ansible-falcon/falcon/FALCON-examples/run/greg200k-sv2/data/greg200k-sv2/subreads2.bam"
+      - "{{ dir }}/ansible-falcon/falcon/FALCON-examples/run/greg200k-sv2/data/greg200k-sv2/subreads2.bam.pbi"
+      - "{{ dir }}/ansible-falcon/falcon/FALCON-examples/run/greg200k-sv2/data/greg200k-sv2/subreads2.dexta"
+      - "{{ dir }}/ansible-falcon/falcon/FALCON-examples/run/greg200k-sv2/data/greg200k-sv2/subreads2.fasta"
+    when: example_in.stat.exists == False
+
+  - name: Pull pbcore container
+    ansible.builtin.command: singularity pull docker://quay.io/biocontainers/pbcore:1.7.1--py27_0
+    args:
+      chdir: "{{dir}}/ansible-falcon/falcon"
+      creates: "{{dir}}/ansible-falcon/falcon/pbcore_1.7.1--py27_0.sif"
+
+  - stat: path="{{dir}}/miniconda3"
+    register: miniconda_env
+
+  - name: Download miniconda install script
+    ansible.builtin.get_url: 
+      url: https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
+      dest: "{{dir}}/ansible-falcon"
+    notify: Clean miniconda install script
+    when: miniconda_env.stat.exists == False
+
+  - name: Create miniconda env
+    ansible.builtin.command: bash Miniconda3-latest-Linux-x86_64.sh -b -p {{ dir }}/miniconda3
+    args:
+      chdir: "{{dir}}/ansible-falcon"
+      creates: "{{dir}}/miniconda3"
+  
+  - name: Test for miniconda init
+    ansible.builtin.lineinfile:
+      dest: "{{home}}/.bashrc"
+      line: '# >>> conda initialize >>>'
+    check_mode: yes
+    register: presence
+
+  - name: Initialise miniconda env
+    ansible.builtin.shell: |
       eval "$("{ dir }}/miniconda3/bin/conda" shell.bash hook)"
       conda config --set auto_activate_base false
       conda init
-  - name: Running Falcon
-    command: sbatch --account=$PAWSEY_PROJECT {{ dir }}/ansible-falcon/falcon/sbatch_nextflow.sh
+    when: presence.changed == True
+
+  handlers:
+  - name: Clean git-sym repo
+    file:
+      path: "{{dir}}/ansible-falcon/falcon/git-sym"
+      state: absent
+  - name: Clean FALCON-examples repo
+    file:
+      path: "{{dir}}/ansible-falcon/falcon/FALCON-examples"
+      state: absent
+  - name: Clean miniconda install script
+    file:
+      path: "{{dir}}/ansible-falcon/Miniconda3-latest-Linux-x86_64.sh"
+      state: absent

@@ -3,7 +3,7 @@ fasta_ch1 = Channel.fromPath('falcon/subreads.fasta.fofn')
 fasta_ch2 = Channel.fromPath('falcon/subreads.fasta.fofn')
 fasta_ch3 = Channel.fromPath('falcon/subreads.fasta.fofn')
 bam_ch = Channel.fromPath('falcon/subreads.bam.fofn')
-dir = "project_dir/ansible-falcon/falcon"
+//dir = "/home/900/dsr900/ansible-falcon/falcon"
 
 process fc_run {
     publishDir "${dir}"

@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 #SBATCH --account=$PAWSEY_PROJECT
 #SBATCH --partition=workq
@@ -9,4 +9,6 @@
 unset SBATCH_EXPORT
 module load nextflow
 
-srun nextflow run falcon/main.nf -profile conda
+which conda
+
+nextflow run falcon/main.nf -profile conda
