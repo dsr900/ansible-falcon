@@ -16,7 +16,7 @@ echo "Setting up Falcon"
 
 ### Leave only preparation of the falcon repo, container, conda env and nextflow input in ansible
 ### as this only needs to be run once
-ansible-playbook ansible.yaml -i vars_list --extra-vars "dir=${proj_dir} home=${HOME}" -v
+ansible-playbook ansible.yaml -i vars_list --extra-vars "dir=${proj_dir} home=${HOME}"
 
 status=$?
 if [[ $status != 0 ]]; then
@@ -33,7 +33,6 @@ echo "${proj_dir}/ansible-falcon/falcon/${bam_read_2}" >> ${proj_dir}/ansible-fa
 ### Move conda activation to inside sbatch_nextflow.sh - Necessary for support at NCI, by default PBS
 ### does not import the user environment (and we do not recommend enabling it)
 cd ${proj_dir}/ansible-falcon
-which conda
 ### nextflow.config will read $dir from the environment
 export dir=${proj_dir}/ansible-falcon/falcon
 ${proj_dir}/ansible-falcon/falcon/sbatch_nextflow.sh

@@ -9,6 +9,4 @@
 unset SBATCH_EXPORT
 module load nextflow
 
-which conda
-
 nextflow run falcon/main.nf -profile conda
